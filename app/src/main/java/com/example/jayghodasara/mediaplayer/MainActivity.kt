@@ -23,7 +23,7 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-        if(fromUser){
+        if (fromUser) {
             mediaPlayer!!.seekTo(progress)
         }
     }
@@ -37,22 +37,22 @@ class MainActivity : AppCompatActivity(), SeekBar.OnSeekBarChangeListener {
     }
 
 
-companion object {
-    lateinit var videofileUri: Uri
+    companion object {
+        lateinit var videofileUri: Uri
 
-}
+    }
 
     lateinit var surfaceHolder: SurfaceHolder
 
-     var mediaPlayer: MediaPlayer?=null
+    var mediaPlayer: MediaPlayer? = null
     var position: Int = 0
     var seekHandler: Handler = Handler()
     lateinit var broadcastReceiver: BroadcastReceiver
-    lateinit var t:Thread
-    lateinit var startintent:Intent
-    lateinit var resumeintent:Intent
-    lateinit var pauseintent:Intent
-    lateinit var br:broadcastreceiver
+    lateinit var t: Thread
+    lateinit var startintent: Intent
+    lateinit var resumeintent: Intent
+    lateinit var pauseintent: Intent
+    lateinit var br: broadcastreceiver
 
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,9 +63,9 @@ companion object {
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
                 if (intent!!.action == "activity_intent") {
-                   position = intent.getIntExtra("curr_position",0)
+                    position = intent.getIntExtra("curr_position", 0)
 
-                    Toast.makeText(applicationContext,position.toString(),Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, position.toString(), Toast.LENGTH_LONG).show()
                 }
 
             }
@@ -81,53 +81,45 @@ companion object {
             startActivityForResult(intent, 1)
 
 
-
-
         })
 
         play.setOnClickListener(View.OnClickListener {
-            position=0
-            var pref=this.getSharedPreferences("Position",android.content.Context.MODE_PRIVATE)
-            pref.edit().putInt("posi",position).apply()
-          startintent=Intent(this,MediaIntentService::class.java)
-            //mediaPlayer!!.start()
-            startintent.putExtra("action","START")
+            position = 0
+            var pref = this.getSharedPreferences("Position", android.content.Context.MODE_PRIVATE)
+            pref.edit().putInt("posi", position).apply()
+            startintent = Intent(this, MediaIntentService::class.java)
+
+            startintent.putExtra("action", "START")
 
             startService(startintent)
-           // seekupdation()
+
 
         })
 
 
         pause.setOnClickListener(View.OnClickListener {
 
-            if(MediaIntentService.mediaplayer2.isPlaying){
+            if (MediaIntentService.mediaplayer2.isPlaying) {
                 position = MediaIntentService.mediaplayer2.currentPosition
                 stopService(startintent)
-                pauseintent= Intent(this,MediaIntentService::class.java)
-                pauseintent.putExtra("action","PAUSE")
+                pauseintent = Intent(this, MediaIntentService::class.java)
+                pauseintent.putExtra("action", "PAUSE")
                 startService(pauseintent)
 //                mediaPlayer!!.pause()
             }
 
 
-//            if (mediaPlayer!!.isPlaying) {
-//                position = mediaPlayer!!.currentPosition
-//                mediaPlayer!!.pause()
-//
-//            }
         })
         Resume.setOnClickListener(View.OnClickListener {
 
 
-
-            if(!MediaIntentService.mediaplayer2.isPlaying){
+            if (!MediaIntentService.mediaplayer2.isPlaying) {
                 stopService(startintent)
-                var pref=this.getSharedPreferences("Position",android.content.Context.MODE_PRIVATE)
-                pref.edit().putInt("posi",position).apply()
-                startintent=Intent(this,MediaIntentService::class.java)
+                var pref = this.getSharedPreferences("Position", android.content.Context.MODE_PRIVATE)
+                pref.edit().putInt("posi", position).apply()
+                startintent = Intent(this, MediaIntentService::class.java)
                 //mediaPlayer!!.start()
-                startintent.putExtra("action","START")
+                startintent.putExtra("action", "START")
 
                 startService(startintent)
 
@@ -141,14 +133,12 @@ companion object {
     }
 
 
-
     var run: Runnable = Runnable {
-        if(mediaPlayer!= null){
+        if (mediaPlayer != null) {
             seekupdation()
         }
 
     }
-
 
 
     fun seekupdation() {
@@ -170,41 +160,25 @@ companion object {
 
     override fun onStop() {
         super.onStop()
-        var pref=this.getSharedPreferences("Position",android.content.Context.MODE_PRIVATE)
-        pref.edit().putInt("posi",position).apply()
-        var int:Intent= Intent("action_start")
+        var pref = this.getSharedPreferences("Position", android.content.Context.MODE_PRIVATE)
+        pref.edit().putInt("posi", position).apply()
+        var int: Intent = Intent("action_start")
         LocalBroadcastManager.getInstance(this).sendBroadcast(int)
 
     }
 
     override fun onResume() {
         super.onResume()
-//        br =broadcastreceiver()
-//        var intentfilter:IntentFilter= IntentFilter("action_start")
-//        registerReceiver(br,intentfilter)
+
     }
 
 
     override fun onDestroy() {
         super.onDestroy()
 
-        Log.i("Destroyed","in Destroy")
-        //unregisterReceiver(br)
+        Log.i("Destroyed", "in Destroy")
 
-
-
-//        var intent= Intent(applicationContext,MediaIntentService::class.java)
-//        intent.putExtra("position",seekbar.progress)
-//        intent.putExtra("videoUri",videofileUri)
-//        if(mediaPlayer!=null){
-//            mediaPlayer!!.stop()
-//            mediaPlayer!!.release()
-//        }
-//
-//        Log.i("Destroyed","in Destroy")
-//        startService(intent)
     }
-
 
 
 }
